@@ -15,11 +15,21 @@ pipeline{
 
         } 
 
-    
-    
         stage (" Checkout from SCM"){
             steps{
                 git branch: 'main', credentialsId: 'github_access_token', url: 'https://github.com/wasrazki/mycompletepipeline'
+            }
+        } 
+
+         stage (" Building the Application"){
+            steps{
+                sh "mvn clean package"
+            }
+        } 
+
+         stage (" Testin the Application"){
+            steps{
+                sh "mvn test"
             }
         } 
     
