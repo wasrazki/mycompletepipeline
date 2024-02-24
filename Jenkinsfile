@@ -77,6 +77,15 @@ pipeline{
                 
             }
         } 
+        
+        stage (" Docker Image Scanning with TRIVY"){
+            steps{
+                script{
+                    sh "trivy image ${IMAGE_NAME}:${IMAGE_TAG}"
+                    
+                }
+            }
+        } 
 
     
 
