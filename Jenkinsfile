@@ -5,6 +5,15 @@ pipeline{
         maven 'Maven3'
 
     }
+    environment{
+        APP_NAME="mycompletepipeline"
+        RELEASE ="1.0.0"
+        DOCKER_USER= "wasraz"  //here it is only used to create the image name and not for the login to the dockerhub registry
+        DOCKER_PASS= "jenkins_dockerhub_access_token"
+        IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
+        IMAGE_TAG="${RELEASE}-${BUILD_NUMBER}"
+
+    }
 
     stages{
         stage (" Cleanup Workspace"){
@@ -21,13 +30,13 @@ pipeline{
             }
         } 
 
-         stage (" Building the Application"){
+        stage (" Building the Application"){
             steps{
                 sh "mvn clean package"
             }
         } 
 
-         stage (" Testin the Application"){
+        stage (" Testing the Application"){
             steps{
                 sh "mvn test"
             }
@@ -47,9 +56,24 @@ pipeline{
 
         stage (" Quality GATE"){
             steps{
-                waitForQualityGate abortPipeline: false , credentialsId: 'jenkins_sonarqube_access_token'
+                waitForQualityGate abortPipeline: false , credentialsId: 'jenkins_sonarqube_access_token' // abortPipeline: true ==> in order to abort the pipeline if the code analysis didn't succed
             }
         } 
+        
+        stage (" Docker Build and Push"){
+            steps{
+                docker.withRegistry('', DOCKER_PASS){
+                    docker_image = docker.build "${IMAGE_NAME}"
+                }
+
+                docker.withRegistry('', DOCKER_PASS){
+                    docker_image.push("${IMAGE_TAG}")
+                    docker_image.push('latest')
+                }
+                
+            }
+        } 
+
     
 
 }
