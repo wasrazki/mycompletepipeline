@@ -4,6 +4,15 @@ COPY . .
 RUN mvn clean install   
 
 
+# Intermediate Stage for Scanning
+FROM trivytool/trivy as scanner
+WORKDIR /app
+COPY --from=build /app .
+
+# Run Trivy scan on the build image
+RUN trivy image --severity HIGH,CRITICAL .
+
+
 FROM eclipse-temurin:17.0.6_10-jdk 
 WORKDIR /app 
 COPY --from=build /app/target/demoapp.jar /app/ 
