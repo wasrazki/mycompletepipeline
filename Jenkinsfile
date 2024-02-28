@@ -14,7 +14,7 @@ pipeline{
         DOCKER_PASS= "jenkins_dockerhub_access_token"
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG="${RELEASE}-${BUILD_NUMBER}"
-        Jenkins_API_access_token = cedentails("Jenkins_API_access_token")
+        Jenkins_API_access_token = credentials("Jenkins_API_access_token")
 
     }
 
