@@ -12,6 +12,7 @@ pipeline{
         DOCKER_PASS= "jenkins_dockerhub_access_token"
         IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
         IMAGE_TAG="${RELEASE}-${BUILD_NUMBER}"
+        Jenkins_API_access_token = "${Jenkins_API_access_token}"
 
     }
 
@@ -86,6 +87,19 @@ pipeline{
                 }
             }
         } 
+
+        stage (" Trigger the CD Pipeline"){ 
+            steps{
+                script{
+                    sh "curl -v -k --user admin:${Jenkins_API_access_token} -X POST -H 'cache-control:no-cache' -H 'content-type: application/x-www-form-urlencoded' --data 'IMAGE_TAG=${IMAHE_TAG}' 'https://20.102.106.35:8080/job/gitops-mycompletepipeline/build?token=gitops-pipeline-token" 
+                    
+                }
+            }
+        } 
+
+
+
+
 
     
 
